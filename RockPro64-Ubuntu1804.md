@@ -2,7 +2,7 @@
 # Panfrost on rockpro64
 Building and running panfrost on the rockpro64 on ayufan's ubuntu bionic build.
 
-Build as per instructions here: [[https://panfrost.freedesktop.org/building-panfrost-mesa.html]]
+Build as per instructions here: [https://panfrost.freedesktop.org/building-panfrost-mesa.html]
 
 ```
 rock64@rockpro64:~$ uname -a
@@ -20,7 +20,17 @@ Codename:       bionic
 
 # Prerequisites
 
+## Upgrade to cosmic
+
+Followed these steps: [https://linuxconfig.org/how-to-upgrade-ubuntu-to-18-10-cosmic-cuttlefish#h9-how-to-upgrade-ubuntu-the-debian-way]
+
+
+## Now install prereqs
 ```
+sudo apt remove -y libmali-rk-midgard-t86x-r14p0   # Maybe???
+sudo apt autoremove
+
+
 sudo apt install -y \
 python3-pip \
 python3 \
@@ -30,8 +40,8 @@ meson \
 zlib1g-dev \
 libexpat1-dev \
 libdrm-dev \
-weston xwayland libwayland-dev wayland-protocols 
-# libegl1-mesa-dev
+weston xwayland libwayland-dev wayland-protocols \
+libwayland-egl-backend-dev
 
 
 ```
