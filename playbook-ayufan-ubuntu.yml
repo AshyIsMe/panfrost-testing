@@ -1,0 +1,103 @@
+---
+
+- name: Upgrade ubuntu bionic to cosmic and install mesa prereqs
+  #hosts: rockpro64
+  hosts: all
+  gather_facts: False
+  become: yes
+  become_user: root
+  pre_tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      changed_when: False
+    - setup: # aka gather_facts
+  tasks:
+    # Run updates first
+    - name: update apt repos and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    # Upgrade to Ubuntu Cosmic
+    - name: find sources
+      find:
+        paths: "/etc/apt/"
+        patterns: "*.list"
+        recurse: yes
+      register: sources
+    - name: update bionic sources to cosmic sources
+      replace:
+        path: "{{ item.path }}"
+        regexp: bionic
+        replace: cosmic
+      loop: "{{ sources.files }}"
+      register: updatesources
+    - name: apt dist-upgrade
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    #- name: reboot
+      #reboot:
+        #msg: rebooting after dist-upgrade
+        #reboot_timeout: 600
+      #when: updatesources.changed
+
+    # Prerequisites
+    - name: Remove libmali-rk-midgard-t86x-r14p0 # Not sure if truly needed
+      apt:
+        name:
+          - libmali-rk-midgard-t86x-r14p0
+      ignore_errors: yes
+    - name: Install panfrost prerequisites
+      apt:
+        name:
+          - git
+          - pkg-config
+          - bison
+          - flex
+          - python3-pip
+          - python3
+          - python3-setuptools
+          - python3-mako
+          - meson
+          - zlib1g-dev
+          - libexpat1-dev
+          - libdrm-dev
+          - weston
+          - xwayland
+          - libwayland-dev
+          - wayland-protocols
+          - libwayland-egl-backend-dev
+          - libxrandr-dev
+    - name: Allow non-root users to access mali hardware
+      file:
+        path: /dev/mali0
+        mode: 0666
+      ignore_errors: yes
+
+- name: Build panfrost mesa
+  #hosts: rockpro64
+  hosts: all
+  tasks:
+    - name: git clone panfrost mesa
+      git:
+        repo: 'https://gitlab.freedesktop.org/panfrost/mesa.git'
+        dest: ~/mesa
+
+    - name: mkdir local prefix
+      file:
+        path: ~/gfx-prefix
+        state: directory
+
+    - name: mkdir build dir
+      file:
+        path: ~/mesa/build
+        state: directory
+    - name: build mesa
+      shell: |
+        #cd ~/mesa/build
+        meson .. . -Ddri-drivers= -Dvulkan-drivers= -Dgallium-drivers=panfrost -Dlibunwind=false --prefix="$HOME"/gfx-prefix
+        ninja install
+      args:
+        chdir: ~/mesa/build
