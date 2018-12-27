@@ -5,19 +5,28 @@ Build as per instructions here: https://panfrost.freedesktop.org/building-panfro
 
 ## Ansible automated steps
 
-The ansible playbook playbook-ayufan-ubuntu.yml will build the panfrost mesa repo on a rockpro64 running ayufan's bionic lxde image.
+The ansible playbook `playbook-ayufan-ubuntu.yml` will build the panfrost mesa repo on a rockpro64 running ayufan's bionic lxde image.
 
+### Usage
+
+```
+cp inventory-sample inventory
+
+vim inventory # Add ip of your rockpro64
+
+ansible-playbook -i inventory --ask-become-pass playbook-ayufan-ubuntu.yml
+```
 
 
 
 ## Manual Steps
 
-1. Upgrade to cosmic
+### Upgrade to cosmic
 
 Followed these steps: [https://linuxconfig.org/how-to-upgrade-ubuntu-to-18-10-cosmic-cuttlefish#h9-how-to-upgrade-ubuntu-the-debian-way]
 
 
-1. Now install prereqs
+### Now install prereqs
 
 ```
 sudo apt remove -y libmali-rk-midgard-t86x-r14p0   # Maybe???
