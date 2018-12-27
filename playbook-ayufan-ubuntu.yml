@@ -19,18 +19,11 @@
         upgrade: yes
 
     # Upgrade to Ubuntu Cosmic
-    - name: find sources
-      find:
-        paths: "/etc/apt/"
-        patterns: "*.list"
-        recurse: yes
-      register: sources
     - name: update bionic sources to cosmic sources
       replace:
-        path: "{{ item.path }}"
-        regexp: bionic
-        replace: cosmic
-      loop: "{{ sources.files }}"
+        path: "/etc/apt/sources.list"
+        regexp: "http://ports.ubuntu.com/ubuntu-ports/ bionic"
+        replace: "http://ports.ubuntu.com/ubuntu-ports/ cosmic"
       register: updatesources
     - name: apt dist-upgrade
       apt:
@@ -48,6 +41,7 @@
       apt:
         name:
           - libmali-rk-midgard-t86x-r14p0
+        state: absent
       ignore_errors: yes
     - name: Install panfrost prerequisites
       apt:
