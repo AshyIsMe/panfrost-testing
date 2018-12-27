@@ -41,7 +41,8 @@ zlib1g-dev \
 libexpat1-dev \
 libdrm-dev \
 weston xwayland libwayland-dev wayland-protocols \
-libwayland-egl-backend-dev
+libwayland-egl-backend-dev \
+libxrandr-dev
 
 
 ```
